@@ -1,0 +1,35 @@
+Package: droptools
+Type: Package
+Title: Diff Revisions of CSV Files Stored in Dropbox
+Version: 0.1.2
+Depends:
+    rdrop2,
+    daff
+Imports:
+    magrittr,
+    dplyr,
+    stats,
+    tibble,
+    utils,
+    stringr,
+    lubridate,
+    httr
+Author: David Holstius
+Maintainer: David Holstius <dholstius@baaqmd.gov>
+Description: Provides tools for diffing revisions of CSV files stored in Dropbox.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
+Suggests:
+    testthat
+Collate: 
+    'diff_dropbox_revisions.R'
+    'dropbox_exclude.R'
+    'dropbox_py.R'
+    'dropbox_status.R'
+    'get_dropbox_data.R'
+    'parse_dropbox_timestamp.R'
+    'get_dropbox_history.R'
+    'my_dropbox.R'
