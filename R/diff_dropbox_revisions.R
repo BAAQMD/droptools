@@ -48,23 +48,35 @@
 #' @seealso [render_diff()] and [diff_data()]
 #'
 #' @export
-diff_dropbox_revisions <- function (path, then, now = NULL) {
+diff_dropbox_revisions <- function (
+  path,
+  then,
+  now = NULL,
+  ...
+) {
 
-  data_now <- get_dropbox_data(path, as_of = now)
-  data_then <- get_dropbox_data(path, as_of = then)
+  now_data <- get_dropbox_data(path, as_of = now, ...)
+  then_data <- get_dropbox_data(path, as_of = then, ...)
 
-  label_for <- function (x) {
+  # This can be either "client_modified" or "server_modified".
+  mod_var <- "client_modified"
+
+  html_label_for <- function (x) {
     metadata <- attr(x, "dropbox_metadata")
-    mod_ts <- metadata[["modified"]]
-    mod_name <- metadata[["modifier.display_name"]]
-    stringr::str_c(mod_ts, "&nbsp;(", mod_name, ")")
+    mod_ts <- metadata[[mod_var]]
+    return(mod_ts)
+    #mod_name <- metadata[["sharing_info.modified_by"]]
+    #stringr::str_c(mod_ts, "&nbsp;(", mod_name, ")")
   }
 
-  label_then <- str_c(label_for(data_then), "&nbsp;")
+  label_then <-
+    html_label_for(then_data) %>%
+    str_c("&nbsp;")
+
   label_now <- if (is.null(now)) {
     "&nbsp;now"
   } else {
-    str_c("</br>", label_for(data_now))
+    str_c("</br>", html_label_for(now_data))
   }
 
   standardize_blanks <- function (x) {
@@ -72,10 +84,15 @@ diff_dropbox_revisions <- function (path, then, now = NULL) {
     dplyr::na_if(trimmed, "")
   }
 
-  diffed <- diff_data(
-    data_then %>% mutate_if(is_character, standardize_blanks),
-    data_now %>% mutate_if(is_character, standardize_blanks))
+  diff_object <-
+    diff_data(
+      then_data,
+      now_data)
 
-  render_diff(diffed, title = str_c(label_then, "&rarr;", label_now))
+  render_diff(
+    diff_object,
+    title = str_c(label_then, "&rarr;", label_now))
+
+  return(invisible(diff_object))
 
 }

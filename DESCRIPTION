@@ -4,6 +4,7 @@ Title: Diff Revisions of CSV Files Stored in Dropbox
 Version: 0.1.2
 Depends:
     rdrop2,
+    dplyr,
     daff
 Imports:
     magrittr,
@@ -23,7 +24,7 @@ LazyData: true
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests:
-    testthat
+    testthat (>= 2.1.0)
 Collate: 
     'diff_dropbox_revisions.R'
     'dropbox_exclude.R'

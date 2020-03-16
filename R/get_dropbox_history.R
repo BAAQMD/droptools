@@ -6,31 +6,32 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom tibble as_tibble
-#' @importFrom dplyr arrange mutate mutate_if desc bind_rows
+#' @importFrom dplyr mutate_at
+#' @importfrom purrr map_df
+#' @importFrom readr parse_datetime
 #'
 #' @include parse_dropbox_timestamp.R
 #'
 #' @export
-get_dropbox_history <- function (path = NULL, dtoken = NULL, rev_limit = 1000) {
+get_dropbox_history <- function (
+  path,
+  limit = 100
+) {
 
-  if (is.null(dtoken)) dtoken <- rdrop2:::get_dropbox_token()
+  rev_list <-
+    rdrop2:::drop_list_revisions(
+      path = path,
+      limit = limit)
 
-  rev_url <- paste0(
-    "https://api.dropbox.com/1/revisions/auto/",
-    rdrop2:::strip_slashes(path))
+  rev_data <-
+    rev_list %>%
+    .[["entries"]] %>%
+    purrr::map_df(
+      ~ as.list(unlist(.))) %>%
+    dplyr::mutate_at(
+      vars(client_modified, server_modified),
+      readr::parse_datetime)
 
-  query <- list(rev_limit = rev_limit)
-  response <- httr::GET(rev_url, config = config(token = dtoken), query = query)
-  httr::stop_for_status(response)
-  results <- httr::content(response)
+  return(rev_data)
 
-  res_df <- lapply(results, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE))
-
-  # WAS: combined <- data.table::rbindlist(res_df, fill = TRUE) %>% as_tibble()
-  combined <- as_tibble(bind_rows(res_df))
-
-  parsed <- mutate(combined, modified = parse_dropbox_timestamp(modified))
-  arrange(parsed, desc(modified))
-
-  #select(revision, modified, client_mtime, modifier.display_name, bytes, path, everything())
 }

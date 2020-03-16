@@ -14,57 +14,114 @@
 #' @importFrom dplyr slice filter
 #'
 #' @export
-get_dropbox_data <- function (path, as_of = NULL, dtoken = NULL) {
+get_dropbox_data <- function (
+  path,
+  as_of = NULL,
+  sheet = 1,
+  ...,
+  dtoken = NULL,
+  verbose = getOption("verbose")
+) {
 
-  # This function is only for use with .CSV data
-  stopifnot(str_to_lower(file_ext(path)) == "csv")
-
-  if (is.null(dtoken)) dtoken <- rdrop2:::get_dropbox_token()
+  msg <- function (...) if(isTRUE(verbose)) message("[get_dropbox_data] ", ...)
 
   if (is.null(as_of)) {
-    # Short-cut to the "current" revision
-    csv_data <- suppressMessages(drop_read_csv(path, dtoken = dtoken, stringsAsFactors = FALSE))
-    return(as_tibble(csv_data))
+    # Default to the "most recent" revision
+    as_of <- Sys.time()
+  } else if (is.character(as_of)) {
+    # Convert `as_of` into a true datetime object
+    as_of <- lubridate::ymd_hms(as_of, tz = Sys.timezone())
   }
 
-  # Make `as_of` into a datetime, if necessary
-  if (is.character(as_of)) {
-    as_of <- ymd_hms(as_of, tz = Sys.timezone())
-  }
+  # This can be either "client_modified" or "server_modified".
+  mod_var <- "client_modified"
 
-  # Be nice (1000 revs is as far back as we can get it)
-  recent_history <- get_dropbox_history(path, rev_limit = 10)
-  if (as_of < min(recent_history[["modified"]])) {
-    recent_history <- get_dropbox_history(path, rev_limit = 100)
-    if (as_of < min(recent_history[["modified"]])) {
-      recent_history <- get_dropbox_history(path, rev_limit = 1000)
-      if (as_of < min(recent_history[["modified"]])) {
-        stop("Can't go that far back, sorry (rev_limit = 1000)")
-      }
+  # Be nice (100 revs is as far back as we can get it)
+  msg("fetching 10 revisions")
+  recent_history <- get_dropbox_history(path, limit = 10)
+  if (as_of < min(recent_history[[mod_var]])) {
+    msg("fetching 100 revisions")
+    recent_history <- get_dropbox_history(path, limit = 100)
+    if (as_of < min(recent_history[[mod_var]])) {
+      stop("Can't go that far back, sorry (rev_limit = 1000)")
     }
   }
 
-  # Discard history that happened after `as_of`
+  # Discard revisions that happened after `as_of`
   prior_history <-
     recent_history %>%
-    arrange(desc(modified)) %>%
-    filter(modified < as_of)
+    filter_at(
+      vars(client_modified),
+      all_vars(. < as_of))
 
-  # Take the first remaining metadata record
-  dropbox_metadata <-
+  # Take the "most recent" remaining record
+  matching_metadata <-
     prior_history %>%
-    slice(1) %>%
-    as.list()
+    filter_at(
+      vars(client_modified),
+      all_vars(. == max(.)))
 
-  base_url <- "https://api-content.dropbox.com/1/files/auto/"
-  query <- with(dropbox_metadata, as.list(rdrop2:::drop_compact(c(rev = rev))))
-  full_download_path <- paste0(base_url, path)
+  msg(mod_var, " is: ", matching_metadata[[mod_var]])
 
-  response <- GET(url = full_download_path, config = config(token = dtoken), query = query)
-  stop_for_status(response)
-  suppressMessages(csv_data <- content(response))
+  matching_id <-
+    pull(
+      matching_metadata,
+      id) %>%
+    stringr::str_remove(
+      "^id:")
 
-  attr(csv_data, "dropbox_metadata") <- dropbox_metadata
-  return(csv_data)
+  matching_rev <-
+    pull(
+      matching_metadata,
+      rev) %>%
+    stringr::str_remove(
+      "^rev:")
+
+  msg("id is: ", matching_id)
+  msg("rev is: ", matching_rev)
+
+  if (is.null(dtoken)) {
+    dtoken <- rdrop2:::get_dropbox_token()
+  }
+
+  path_ext <-
+    tools::file_ext(path) %>%
+    str_to_lower()
+
+  json_payload <-
+    list(path = str_c("rev:", matching_rev)) %>%
+    jsonlite::toJSON(auto_unbox = TRUE)
+
+  response_object <-
+    httr::POST(
+      url = "https://content.dropboxapi.com/2/files/download",
+      config = config(
+        token = rdrop2:::get_dropbox_token()),
+      httr::add_headers(
+        `Dropbox-API-Arg` = json_payload))
+  #httr::verbose())
+
+  stop_for_status(response_object)
+  response_content <- httr::content(response_object, as = "raw")
+  msg("md5(content) is: ", digest::digest(response_content, algo = "md5"))
+  response_path <- tempfile(fileext = str_c(".", path_ext))
+  msg("writing raw content to ", response_path)
+  readr::write_file(response_content, path = response_path)
+
+  if (path_ext == "csv") {
+    downloaded_data <-
+      read_csv(
+        response_path,
+        ...)
+  } else if (path_ext == "xlsx") {
+    downloaded_data <-
+      readxl::read_xlsx(
+        response_path,
+        sheet = sheet,
+        ...)
+  }
+
+  attr(downloaded_data, "dropbox_metadata") <- matching_metadata
+  return(downloaded_data)
 
 }
