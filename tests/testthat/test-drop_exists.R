@@ -23,7 +23,7 @@ test_that("case insensitivity", {
   test_path <- traceless("Test Drop Exists")
 
   expect_message(
-    rdrop2:: drop_create(test_path),
+    rdrop2::drop_create(test_path),
     "created successfully")
 
   expect_true(
