@@ -12,7 +12,7 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr arrange mutate mutate_if desc as_tibble
-#' @importFrom stringr str_c
+#' @importFrom stringr str_c str_trim
 #' @importFrom daff diff_data render_diff
 #'
 #' @examples
@@ -71,7 +71,7 @@ diff_dropbox_revisions <- function (
 
   label_then <-
     html_label_for(then_data) %>%
-    str_c("&nbsp;")
+    stringr::str_c("&nbsp;")
 
   label_now <- if (is.null(now)) {
     "&nbsp;now"
@@ -85,13 +85,13 @@ diff_dropbox_revisions <- function (
   }
 
   diff_object <-
-    diff_data(
+    daff::diff_data(
       then_data,
       now_data)
 
-  render_diff(
+  daff::render_diff(
     diff_object,
-    title = str_c(label_then, "&rarr;", label_now))
+    title = stringr::str_c(label_then, "&rarr;", label_now))
 
   return(invisible(diff_object))
 

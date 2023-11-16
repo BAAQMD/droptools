@@ -9,7 +9,7 @@
 #' @importFrom readr read_csv write_file
 #' @importFrom tibble as_tibble
 #' @importFrom stringr str_to_lower str_remove
-#' @importFrom httr GET config stop_for_status content
+#' @importFrom httr POST add_headers config stop_for_status content
 #' @importFrom rdrop2 drop_read_csv
 #' @importFrom lubridate ymd_hms
 #' @importFrom readxl read_xlsx
@@ -97,7 +97,7 @@ get_dropbox_data <- function (
   response_object <-
     httr::POST(
       url = "https://content.dropboxapi.com/2/files/download",
-      config = config(
+      config = httr::config(
         token = rdrop2:::get_dropbox_token()),
       httr::add_headers(
         `Dropbox-API-Arg` = json_payload))

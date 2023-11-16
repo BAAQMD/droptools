@@ -7,7 +7,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr mutate_at
-#' @importfrom purrr map_df
+#' @importFrom purrr map_df
 #' @importFrom readr parse_datetime
 #'
 #' @include parse_dropbox_timestamp.R
