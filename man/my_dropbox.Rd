@@ -18,15 +18,14 @@ Forms a path to file(s) or folders in your Dropbox.
 Works just like \code{file.path("~", "Dropbox", ...)}
 }
 \note{
-Looks first for "~/Dropbox (BAAQMD)". Failing that, looks for "~/Dropbox" instead. Throws an error if neither can be found.
+Looks for the following, in order:
+\itemize{
+\item "BAAQMD Dropbox"
+\item "Dropbox (BAAQMD)"
+\item "Dropbox"
 }
-\examples{
-csv_path <-
-  my_dropbox("BY2015", "Training", "ari", "02-input",
-             "BY2015-throughputs-area_sources.csv")
 
-file.exists(csv_path)
-
+Throws an error if none can be found.
 }
 \seealso{
 \code{\link[=file.path]{file.path()}}

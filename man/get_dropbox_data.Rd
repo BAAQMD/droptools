@@ -4,7 +4,14 @@
 \alias{get_dropbox_data}
 \title{Get the version that existed at a certain time}
 \usage{
-get_dropbox_data(path, as_of = NULL, dtoken = NULL)
+get_dropbox_data(
+  path,
+  as_of = NULL,
+  sheet = 1,
+  ...,
+  dtoken = NULL,
+  verbose = getOption("verbose")
+)
 }
 \arguments{
 \item{path}{relative to ~/Dropbox}

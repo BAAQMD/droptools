@@ -2,10 +2,9 @@ Package: droptools
 Type: Package
 Title: Diff Revisions of CSV Files Stored in Dropbox
 Version: 2023.11.16
-Depends:
-    dplyr,
-    daff
 Imports:
+    daff,
+    rdrop2,
     magrittr,
     dplyr,
     stats,
@@ -20,7 +19,7 @@ Description: Provides tools for diffing revisions of CSV files stored in Dropbox
 License: MIT
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests:
     testthat (>= 2.1.0)

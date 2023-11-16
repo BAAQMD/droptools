@@ -4,7 +4,7 @@
 \alias{get_dropbox_history}
 \title{Get history from Dropbox API}
 \usage{
-get_dropbox_history(path = NULL, dtoken = NULL, rev_limit = 1000)
+get_dropbox_history(path, limit = 100)
 }
 \arguments{
 \item{path}{relative to ~/Dropbox}

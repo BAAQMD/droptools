@@ -4,7 +4,7 @@
 \alias{diff_dropbox_revisions}
 \title{Diff a CSV file's history}
 \usage{
-diff_dropbox_revisions(path, then, now = NULL)
+diff_dropbox_revisions(path, then, now = NULL, ...)
 }
 \arguments{
 \item{path}{relative to ~/Dropbox}
