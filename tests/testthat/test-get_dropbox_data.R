@@ -3,7 +3,7 @@ context("get_dropbox_data")
 XLSX_path <- "/BY2015/Categories/BY2015_categories_assignment.xlsx"
 
 expect_true(
-  drop_exists(
+  rdrop2::drop_exists(
     XLSX_path))
 
 get_dropbox_history(
