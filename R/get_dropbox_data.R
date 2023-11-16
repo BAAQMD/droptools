@@ -6,12 +6,14 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom tools file_ext
+#' @importFrom readr read_csv write_file
 #' @importFrom tibble as_tibble
-#' @importFrom stringr str_to_lower
+#' @importFrom stringr str_to_lower str_remove
 #' @importFrom httr GET config stop_for_status content
 #' @importFrom rdrop2 drop_read_csv
 #' @importFrom lubridate ymd_hms
-#' @importFrom dplyr slice filter
+#' @importFrom readxl read_xlsx
+#' @importFrom dplyr slice filter filter_at
 #'
 #' @export
 get_dropbox_data <- function (
@@ -101,7 +103,7 @@ get_dropbox_data <- function (
         `Dropbox-API-Arg` = json_payload))
   #httr::verbose())
 
-  stop_for_status(response_object)
+  httr::stop_for_status(response_object)
   response_content <- httr::content(response_object, as = "raw")
   msg("md5(content) is: ", digest::digest(response_content, algo = "md5"))
   response_path <- tempfile(fileext = str_c(".", path_ext))
@@ -110,7 +112,7 @@ get_dropbox_data <- function (
 
   if (path_ext == "csv") {
     downloaded_data <-
-      read_csv(
+      readr::read_csv(
         response_path,
         ...)
   } else if (path_ext == "xlsx") {
