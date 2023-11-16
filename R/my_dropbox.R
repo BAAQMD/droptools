@@ -26,9 +26,8 @@ my_dropbox <- function (..., mustWork = FALSE, verbose = FALSE) {
     file.path("~", "Dropbox"))
 
   for (path in path_options) {
-    abs_path <- normalizePath(path)
-    if (dir.exists(abs_path)) {
-      return(abs_path)
+    if (dir.exists(path)) {
+      return(normalizePath(path))
     }
   }
 
