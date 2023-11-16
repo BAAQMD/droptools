@@ -1,9 +1,8 @@
 Package: droptools
 Type: Package
 Title: Diff Revisions of CSV Files Stored in Dropbox
-Version: 0.1.2
+Version: 2023.11.16
 Depends:
-    rdrop2,
     dplyr,
     daff
 Imports:
