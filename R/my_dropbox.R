@@ -8,6 +8,8 @@
 #' @param mustWork passed to normalizePath()
 #' @param verbose logical
 #'
+#' @importFrom fs path path_home
+#'
 #' @note Looks for the following, in order:
 #' - "BAAQMD Dropbox"
 #' - "Dropbox (BAAQMD)"
@@ -20,10 +22,12 @@
 #' @export
 my_dropbox <- function (..., mustWork = FALSE, verbose = FALSE) {
 
+  home <- fs::path_home()
+
   path_options <- list(
-    file.path("~", "BAAQMD Dropbox"),
-    file.path("~", "Dropbox (BAAQMD)"),
-    file.path("~", "Dropbox"))
+    fs::path(home, "BAAQMD Dropbox"),
+    fs::path(home, "Dropbox (BAAQMD)"),
+    fs::path(home, "Dropbox"))
 
   for (path in path_options) {
     if (dir.exists(path)) {
@@ -31,6 +35,10 @@ my_dropbox <- function (..., mustWork = FALSE, verbose = FALSE) {
     }
   }
 
-  stop("Can't find a Dropbox directory")
+  err_msg <- paste0(
+    "Can't find a Dropbox directory under ",
+    home)
+
+  stop(err_msg)
 
 }
