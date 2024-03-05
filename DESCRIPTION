@@ -23,9 +23,3 @@ RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests:
     testthat (>= 2.1.0)
-Collate: 
-    'dropbox_exclude.R'
-    'dropbox_py.R'
-    'dropbox_status.R'
-    'parse_dropbox_timestamp.R'
-    'my_dropbox.R'

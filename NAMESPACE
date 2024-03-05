@@ -2,8 +2,8 @@
 
 export(dropbox_exclude)
 export(dropbox_status)
-export(my_dropbox)
 export(parse_dropbox_timestamp)
+export(path_dropbox)
 importFrom(fs,path)
 importFrom(fs,path_home)
 importFrom(lubridate,fast_strptime)

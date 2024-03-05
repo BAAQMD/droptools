@@ -5,8 +5,7 @@
 #' Works just like `file.path("~", "Dropbox", ...)`
 #'
 #' @param \dots path components (as in [file.path()])
-#' @param mustWork passed to normalizePath()
-#' @param verbose logical
+#' @param mustWork passed to [normalizePath()]
 #'
 #' @importFrom fs path path_home
 #'
@@ -20,7 +19,7 @@
 #' @seealso [file.path()]
 #'
 #' @export
-my_dropbox <- function (..., mustWork = FALSE, verbose = FALSE) {
+path_dropbox <- function (..., mustWork = FALSE) {
 
   home <- fs::path_home()
 
@@ -31,14 +30,21 @@ my_dropbox <- function (..., mustWork = FALSE, verbose = FALSE) {
 
   for (path in path_options) {
     if (dir.exists(path)) {
-      return(normalizePath(path))
+      normalized <- normalizePath(path)
+      return(file.path(normalized, ...))
     }
   }
 
-  err_msg <- paste0(
-    "Can't find a Dropbox directory under ",
-    home)
+  err_msg <-
+    paste0(
+      "Can't find a Dropbox directory under ", home)
 
   stop(err_msg)
 
 }
+
+#' @describeIn path_dropbox alias
+my_dropbox <- path_dropbox
+
+#' @describeIn path_dropbox alias
+dropbox_path <- path_dropbox
