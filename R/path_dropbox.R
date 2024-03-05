@@ -44,7 +44,9 @@ path_dropbox <- function (..., mustWork = FALSE) {
 }
 
 #' @describeIn path_dropbox alias
+#' @export
 my_dropbox <- path_dropbox
 
 #' @describeIn path_dropbox alias
+#' @export
 dropbox_path <- path_dropbox
