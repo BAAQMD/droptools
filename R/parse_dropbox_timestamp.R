@@ -5,8 +5,8 @@
 #'
 #' @note If `UTC` is `FALSE`, uses `Sys.timezone()` instead
 #'
-#' @importFrom lubridate fast_strptime
-#' @importFrom stringr str_extract
+#' @importFrom lubridate hm fast_strptime with_tz
+#' @importFrom stringr str_match
 #'
 #' @export
 parse_dropbox_timestamp <- function (x, UTC = FALSE) {
