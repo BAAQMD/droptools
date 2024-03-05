@@ -1,17 +1,11 @@
 Package: droptools
 Type: Package
-Title: Diff Revisions of CSV Files Stored in Dropbox
+Title: Tools for working with Dropbox
 Version: 2024.03.04
 Imports:
-    daff,
-    magrittr,
-    dplyr,
-    stats,
-    tibble,
     utils,
     stringr,
     lubridate,
-    httr,
     fs
 Author: David Holstius
 Maintainer: David Holstius <dholstius@baaqmd.gov>
